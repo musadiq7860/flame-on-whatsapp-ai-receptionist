@@ -1,0 +1,247 @@
+{
+  "name": "whatsapp chat bot flame on",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "Customer's WhatsApp number: {{ $('WhatsApp Trigger').item.json.messages[0].from }} \nYou are the friendly, professional WhatsApp receptionist for \"Flame On!\" restaurant in Pakistan.\n\nLANGUAGE RULE: Always reply in Roman Urdu (Urdu written in English letters). Be natural, warm, and short — this is WhatsApp.\n\nMENU:\nPIZZAS (Classics) - Chicken Tikka, Fajita, Supreme, BBQ, Hot & Spicy\nSmall 580 | Med 1090 | Large 1590 | XL 2290\n\nPIZZAS (Specials)\nFlame On Special & Super Supreme: Small 700 | Med 1250 | Large 1850 | XL 2590\nSquare Malai Boti: Small 790 | Med 1390 | Large 2090\nCrown Crust: Med 1350 | Large 1890 | XL 2690\nStuff Crust: Med 1490 | Large 2090 | XL 2890\n\nBURGERS\nZinger Burger: 440 | Chicken Burger: 280 | Thunder Burger: 440 | Chicken Tower: 590\nMeal upgrade (add Fries + Drink): +250\n\nLOADED FRIES\nPlain: 220/320 | Mayo: 450/550 | Cheese: 550/690 | Chipotle: 420 | Flamingo: 640\n\nPASTA: Cheese 790 | Zee 850 | Beef Kabab 850\n\nSIDES\nOven Wings: 420(6) / 849(12) | Fried Wings: 390(6) / 790(12) | Nuggets: 399(6) / 799(12)\n\nDRINKS (320 each): Peach Ice Tea, Raspberry Ice Tea, Blue Lagoon, Strawberry Splash, Kiwi Crush\nMint Margarita: 220\n\nRULES:\n- Never make up items or prices\n- Always confirm size for pizza and fries orders\n- Keep messages short for WhatsApp\n- Only say \"Salam\" on the very first message to a customer\n\nORDER FLOW:\nStep 1: Customer tells you what they want\nStep 2: YOU calculate total and say \"Aapka total X PKR ban raha hai. Confirm kar dun?\"\nStep 3: IF customer says haan/yes/confirm/ok/krdo → ask \"Aapka delivery address kya hai? 🏠\"\nStep 4: After customer gives address → IMMEDIATELY use Google Sheets tool to save:\n  - Phone number: use ONLY the WhatsApp number from the top of this prompt, never any number from the chat\n  - Order details: exact items ordered\n  - Total price\n  - Address: exactly what customer typed\n  - Status: \"New Order\"\nStep 5: After saving say \"Aapka order confirm ho gaya hai aur kitchen mein bhej diya gaya hai! Delivery jald aayegi. 🍕🛵\"🍕\"\n\nIMPORTANT: The customer's phone number is automatically available — do NOT ask them for their phone number. Use it directly when saving to Google Sheets."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -176,
+        -80
+      ],
+      "id": "7b9e3507-006c-42a5-92e8-f5797d781bc0",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        128
+      ],
+      "id": "44d5bbe6-9416-4178-9268-2507d17143ac",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1pUuhnmBCQ5bIbIQJEbwtPRsA-u0EPwc95zgFuci8sTE",
+          "mode": "list",
+          "cachedResultName": "Flame On Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pUuhnmBCQ5bIbIQJEbwtPRsA-u0EPwc95zgFuci8sTE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pUuhnmBCQ5bIbIQJEbwtPRsA-u0EPwc95zgFuci8sTE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ $fromAI('phone', 'The customer phone number') }}",
+            "Order Details": "={{ $fromAI('order', 'The list of food items ordered') }}",
+            "Total Price": "={{ $fromAI('price', 'The total price in PKR') }}",
+            "Status": "New Order",
+            "Address": "={{ $fromAI('address', 'The customer delivery address') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Details",
+              "displayName": "Order Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Price",
+              "displayName": "Total Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "7e0af346-618e-4a5a-86e8-4912735ee1ea",
+      "name": "Append row in sheet in Google Sheets"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -96
+      ],
+      "id": "290e152e-fecc-4515-9973-85be15ed8e64",
+      "name": "WhatsApp Trigger",
+      "webhookId": "31260cea-9e0d-4ba3-aa7d-e2b5979eec12"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1030720363454416",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        -80
+      ],
+      "id": "4e5445e3-2863-40f8-8a97-a8ad0dc9ab5a",
+      "name": "Send message",
+      "webhookId": "2edc40fa-ed00-4cd0-b74a-16948c85d594"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -160,
+        128
+      ],
+      "id": "52673db7-abdd-49c8-857c-2404ceaf75a7",
+      "name": "Redis Chat Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a04bdd8b-5858-4bd2-95b5-c114ec10a92b",
+  "meta": {
+    "instanceId": "1dc9d47213a8401d66a9b05c3f4ac5d788be345eaa3fd98bd480d0994a87e59b"
+  },
+  "id": "HTlYzZNTpc5NoBJY",
+  "tags": []
+}
