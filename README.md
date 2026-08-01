@@ -46,8 +46,9 @@ The entire menu, pricing, and conversation rules live in the **AI Agent** node's
 
 ## Contributors
 
-- [Mussadiq](https://github.com/musadiq7860)
-- Faraz Shoukat
+- [Muhammad Musaddaq Qaysir](https://github.com/musadiq7860)
+- [Faraz shoukat](https://github.com/farazshoukat)
+
 
 ## License
 
